@@ -1,1 +1,41 @@
+name: CI/CD for Spring Boot Application
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 push될 때마다 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker image
+        run: |
+          docker build -t cicd-project .
+
+      - name: SSH to AWS Instance
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.AWS_IP }}  # AWS 인스턴스 IP
+          username: ubuntu  # 인스턴스 사용자명 (보통 ubuntu)
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}  # SSH 개인 키
+          port: 22
+          script: |
+            docker pull cicd-project
+            docker run -d -p 8080:8080 cicd-project
 
