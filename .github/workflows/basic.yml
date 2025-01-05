@@ -18,13 +18,14 @@ jobs:
   checkout:
     runs-on: ubuntn-latest
     steps:
-      -uses: actoins/chekout@v4
+      - uses: actoins/chekout@v4
   process:
     runs-on: ubuntu-latest
     steps:
-      -name:Run a one-line script
-      run: echo Hello, world!
-      -name: Run a multi-line script
-      run: 
-        echo Add other actoins to build
-        echo test, and deploy my project
+      - name: Run a one-line script
+        run: echo Hello, world!
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build
+          echo test, and deploy my project
+
