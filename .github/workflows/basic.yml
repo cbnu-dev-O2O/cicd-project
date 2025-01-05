@@ -18,7 +18,7 @@ jobs:
   checkout:
     runs-on: ubuntu-latest
     steps:
-      - uses: actoins/chekout@v4
+      - uses: actions/checkout@v4
   process:
     runs-on: ubuntu-latest
     steps:
