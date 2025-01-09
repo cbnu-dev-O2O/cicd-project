@@ -50,11 +50,15 @@ jobs:
         ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${LIGHTSAIL_HOST} << 'EOF'
           # 기존 실행 중인 Java 애플리케이션 종료
           pkill -f 'java -jar' || true
-          
-          # 새 애플리케이션 실행
-          nohup java -jar cicd-0.0.1-SNAPSHOT.jar &
+      
+          # 새 애플리케이션 실행 (로그 파일로 리디렉션)
+          nohup java -jar /home/ubuntu/app/cicd-0.0.1-SNAPSHOT.jar > /home/ubuntu/app/app.log 2>&1 &
+      
+          # 프로세스 세션 분리
+          disown
         EOF
         rm lightsail.pem
+
 
     # Docker 관련 부분 주석 처리
     # - name: Docker Build
