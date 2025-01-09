@@ -1,60 +1,31 @@
-name: CI/CD for Spring Boot Application
+# This is a basic workflow to help you get started with Actions
 
+name: CI
+
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: ["master"]
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  deploy:
+  checkout:
     runs-on: ubuntu-latest
     steps:
-    # 1.1 리포지토리 체크아웃
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    # 1.2 Gradle 실행 권한 부여
-    - name: Give Gradle wrapper execute permission
-      run: chmod +x ./gradlew
-
-    # 1.3 Java 버전 설정
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    # 1.4 Gradle 빌드 실행
-    - name: Build with Gradle
-      run: |
-        ./gradlew clean build
-
-    # 1.5 빌드 결과물 전송 (SCP 명령어 사용)
-    - name: Upload build artifact to Lightsail
-      env:
-        LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
-      run: |
-        echo "${LIGHTSAIL_KEY}" > lightsail.pem
-        chmod 600 lightsail.pem
-        scp -i lightsail.pem -o StrictHostKeyChecking=no build/libs/*.jar ubuntu@${LIGHTSAIL_HOST}:/home/ubuntu/app/
-        rm lightsail.pem
-
-    # 1.6 Lightsail에서 애플리케이션 실행
-    - name: Start application on Lightsail
-      env:
-        LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
-      run: |
-        echo "${LIGHTSAIL_KEY}" > lightsail.pem
-        chmod 600 lightsail.pem
-        ssh -i lightsail.pem -o StrictHostKeyChecking=no ubuntu@${LIGHTSAIL_HOST} << 'EOF'
-          pkill -f 'java -jar' || true
-          nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
-        EOF
-        rm lightsail.pem
-
-    # Docker 관련 부분 주석 처리
-    # - name: Docker Build
-    #   run: docker build -t my-spring-boot-app .
-    # - name: Docker Push
-    #   run: docker push my-docker-repo/my-spring-boot-app:latest
+      - uses: actoins/chekout@v4
+      - uses: actions/checkout@v4
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run a one-line script
+        run: echo Hello, world!
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build
+          echo test, and deploy my project
