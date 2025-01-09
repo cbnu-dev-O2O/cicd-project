@@ -36,7 +36,7 @@ jobs:
       run: |
         echo "${LIGHTSAIL_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
-        scp -i lightsail.pem -o StrictHostKeyChecking=no build/libs/*.jar ubuntu@${LIGHTSAIL_HOST}:/home/ubuntu/app/
+        scp -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null build/libs/*.jar ubuntu@${LIGHTSAIL_HOST}:/home/ubuntu/app/
         rm lightsail.pem
 
     # 1.6 Lightsail에서 애플리케이션 실행
@@ -47,7 +47,7 @@ jobs:
       run: |
         echo "${LIGHTSAIL_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
-        ssh -i lightsail.pem -o StrictHostKeyChecking=no ubuntu@${LIGHTSAIL_HOST} << 'EOF'
+        ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${LIGHTSAIL_HOST} << 'EOF'
           pkill -f 'java -jar' || true
           nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
         EOF
