@@ -41,7 +41,6 @@ jobs:
         rm lightsail.pem
 
     # 1.6 Lightsail에서 애플리케이션 실행
-        # 1.6 Lightsail에서 애플리케이션 실행
     - name: Start application on Lightsail
       env:
         LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
@@ -54,13 +53,20 @@ jobs:
           # 기존 실행 중인 Java 애플리케이션 종료
           pkill -f 'java -jar' || true
           
-          # 새 애플리케이션 실행 (로그 파일로 리디렉션)
+          # 애플리케이션 실행
           nohup java -jar /home/${LIGHTSAIL_USERNAME}/app/cicd-0.0.1-SNAPSHOT.jar > /home/${LIGHTSAIL_USERNAME}/app/app.log 2>&1 &
+          
+          # 프로세스 확인
+          ps aux | grep java
           
           # 세션 분리
           disown
+          
+          # 종료 상태 확인
+          echo "Application started"
         EOF
         rm lightsail.pem
+
 
 
     # Docker 관련 부분 주석 처리
