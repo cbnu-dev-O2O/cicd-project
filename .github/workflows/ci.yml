@@ -48,8 +48,15 @@ jobs:
         echo "${LIGHTSAIL_SSH_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
         ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${LIGHTSAIL_HOST} << 'EOF'
+          # 기존 실행 중인 Java 애플리케이션 종료
           pkill -f 'java -jar' || true
+          
+          # 새 애플리케이션 실행
           nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
+          
+          # 애플리케이션 실행 상태 확인 (예: Java 프로세스 확인)
+          sleep 10  # 잠시 대기하여 애플리케이션이 완전히 시작될 때까지
+          ps aux | grep java
         EOF
         rm lightsail.pem
 
