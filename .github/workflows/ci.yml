@@ -5,7 +5,7 @@ on:
     branches: ["master"]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     # 1.1 리포지토리 체크아웃
@@ -28,40 +28,33 @@ jobs:
       run: |
         ./gradlew clean build
 
-    # 1.5 빌드 결과물 아티팩트로 저장
-    - name: Save build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-artifact
-        path: build/libs/*.jar
+    # 1.5 빌드 결과물 전송 (SCP 명령어 사용)
+    - name: Upload build artifact to Lightsail
+      env:
+        LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
+      run: |
+        echo "${LIGHTSAIL_KEY}" > lightsail.pem
+        chmod 600 lightsail.pem  # 권한 설정
+        scp -i lightsail.pem -o StrictHostKeyChecking=no build/libs/*.jar ubuntu@${LIGHTSAIL_HOST}:/home/ubuntu/app/
+        rm lightsail.pem
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build  # Build Job이 완료된 후 실행
-    steps:
-    # 2.1 빌드 결과물 다운로드
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: build-artifact
-
-    # 2.2 빌드 결과물 전송
-    - name: Upload build artifacts to Lightsail
-      uses: appleboy/scp-action@v0.1.2
-      with:
-        host: ${{ secrets.LIGHTSAIL_HOST }}
-        username: ${{ secrets.LIGHTSAIL_USERNAME }}
-        key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-        source: build-artifact/*.jar
-        target: /home/ubuntu/app
-
-    # 2.3 Lightsail에서 애플리케이션 실행
+    # 1.6 Lightsail에서 애플리케이션 실행
     - name: Start application on Lightsail
-      uses: appleboy/ssh-action@v0.1.2
-      with:
-        host: ${{ secrets.LIGHTSAIL_HOST }}
-        username: ${{ secrets.LIGHTSAIL_USERNAME }}
-        key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-        script: |
-          pkill -f 'java -jar' || true # 기존 애플리케이션 종료
+      env:
+        LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
+      run: |
+        echo "${LIGHTSAIL_KEY}" > lightsail.pem
+        chmod 600 lightsail.pem  # 권한 설정
+        ssh -i lightsail.pem -o StrictHostKeyChecking=no ubuntu@${LIGHTSAIL_HOST} << 'EOF'
+          pkill -f 'java -jar' || true
           nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
+        EOF
+        rm lightsail.pem
+
+    # Docker 관련 부분 주석 처리
+    # - name: Docker Build
+    #   run: docker build -t my-spring-boot-app .
+    # - name: Docker Push
+    #   run: docker push my-docker-repo/my-spring-boot-app:latest
