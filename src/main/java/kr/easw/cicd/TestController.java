@@ -13,7 +13,7 @@ public class TestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/test2")
+    //@GetMapping("/test2")
     public ResponseEntity<Void> test2() {
         System.out.println("test2");
         return ResponseEntity.noContent().build();
