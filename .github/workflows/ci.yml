@@ -32,9 +32,9 @@ jobs:
     - name: Upload build artifact to Lightsail
       env:
         LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
+        LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
       run: |
-        echo "${LIGHTSAIL_KEY}" > lightsail.pem
+        echo "${LIGHTSAIL_SSH_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
         scp -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null build/libs/*.jar ubuntu@${LIGHTSAIL_HOST}:/home/ubuntu/app/
         rm lightsail.pem
@@ -43,9 +43,9 @@ jobs:
     - name: Start application on Lightsail
       env:
         LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        LIGHTSAIL_KEY: ${{ secrets.LIGHTSAIL_KEY }}
+        LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
       run: |
-        echo "${LIGHTSAIL_KEY}" > lightsail.pem
+        echo "${LIGHTSAIL_SSH_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
         ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${LIGHTSAIL_HOST} << 'EOF'
           pkill -f 'java -jar' || true
@@ -55,6 +55,6 @@ jobs:
 
     # Docker 관련 부분 주석 처리
     # - name: Docker Build
-    #   run: docker build -t my-spring-boot-app .
+    #   run: docker build -t my-spring-boot-app . 
     # - name: Docker Push
     #   run: docker push my-docker-repo/my-spring-boot-app:latest
