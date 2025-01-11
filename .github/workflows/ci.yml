@@ -53,42 +53,22 @@ jobs:
       run: |
         echo "${LIGHTSAIL_SSH_KEY}" > lightsail.pem
         chmod 600 lightsail.pem  # 권한 설정
-
-        # SSH 연결 및 환경 변수 확인
         ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} << 'EOF'
-          # LIGHTSAIL_USERNAME 값 출력
-          echo "LIGHTSAIL_USERNAME is: $LIGHTSAIL_USERNAME"
-
-          # 애플리케이션 디렉토리 및 로그 파일 준비
-          mkdir -p /home/${LIGHTSAIL_USERNAME}/app/
-          touch /home/${LIGHTSAIL_USERNAME}/app/app.log
-          chmod 755 /home/${LIGHTSAIL_USERNAME}/app/
-          chmod 666 /home/${LIGHTSAIL_USERNAME}/app/app.log
-
-          # 기존 Java 애플리케이션 종료
-          if pgrep -f 'java -jar' > /dev/null; then
-            echo "Stopping running Java application..."
-            pkill -f 'java -jar'
-            sleep 5  # 종료 대기
-          else
-            echo "No Java application running."
-          fi
-
-          # 새 애플리케이션 실행
-          echo "Starting new Java application..."
-          nohup java -jar /home/${LIGHTSAIL_USERNAME}/app/*.jar > /home/${LIGHTSAIL_USERNAME}/app/app.log 2>&1 &
-          sleep 3  # 프로세스 안정화 대기
-
-          # 프로세스 상태 확인
-          if pgrep -f 'java -jar' > /dev/null; then
-            echo "Application started successfully."
-            ps aux | grep '[j]ava'
-          else
-            echo "Failed to start the application."
-            exit 1
-          fi
+          # 기존 실행 중인 Java 애플리케이션 종료
+          pkill -f 'java -jar' || true
+          
+          # 새 애플리케이션 실행 (로그 파일로 리디렉션)
+          # 애플리케이션 실행
+          nohup java -jar /home/${LIGHTSAIL_USERNAME}/app/cicd-0.0.1-SNAPSHOT.jar > /home/${LIGHTSAIL_USERNAME}/app/app.log 2>&1 &
+          
+          # 프로세스 확인
+          ps aux | grep java
+          
+          # 세션 분리
+          disown
+          
+          # 종료 상태 확인
+          echo "Application started"
         EOF
-
-        # SSH 키 파일 삭제
         rm lightsail.pem
 
