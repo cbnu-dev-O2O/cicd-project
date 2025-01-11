@@ -44,6 +44,16 @@ jobs:
      #   chmod -R 755 /home/${LIGHTSAIL_USERNAME}/app/
       #  chmod 777 /home/${LIGHTSAIL_USERNAME}/app/app.log
 
+    - name: Check if LIGHTSAIL_USERNAME is set
+      run: |
+        if [ -z "${{ secrets.LIGHTSAIL_USERNAME }}" ]; then
+          echo "LIGHTSAIL_USERNAME is not set!"
+          exit 1
+        else
+          echo "LIGHTSAIL_USERNAME is set."
+        fi
+
+
 
     # 1.7 Lightsail에서 애플리케이션 실행
     - name: Start application on Lightsail
@@ -62,6 +72,8 @@ jobs:
         # 종료된 프로세스 확인
         echo "Checking if Java processes are still running..."
         ps aux | grep java
+
+        
 
         echo "Checking if the JAR file exists..."
         ls -l /home/${LIGHTSAIL_USERNAME}/app/cicd-0.0.1-SNAPSHOT.jar
