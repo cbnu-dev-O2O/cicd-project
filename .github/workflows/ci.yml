@@ -61,7 +61,7 @@ jobs:
           
           # 새 애플리케이션 실행 (로그 파일로 리디렉션)
           # 애플리케이션 실행
-          nohup java -jar /home/${LIGHTSAIL_USERNAME}/app/cicd-0.0.1-SNAPSHOT.jar > /home/${LIGHTSAIL_USERNAME}/app/app.log 2>&1 &
+          nohup java -jar /home/ubuntu/app/*.jar > /home/ubuntu/app/app.log 2>&1 &
           
           # 프로세스 확인
           ps aux | grep java
