@@ -56,22 +56,25 @@ jobs:
         chmod 600 lightsail.pem  # 권한 설정
         ssh -i lightsail.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} << 'EOF'
           # 기존 실행 중인 Java 애플리케이션 종료
-          pkill -f 'java -jar' || true
-          
-          # 새 애플리케이션 실행 (로그 파일로 리디렉션)
-          # 애플리케이션 실행
-          nohup java -jar cicd-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        echo "Stopping existing Java application..."
+        pkill -f 'java -jar' || true
+        
+        # 종료된 프로세스 확인
+        echo "Checking if Java processes are still running..."
+        ps aux | grep java
+        
+        # 새 애플리케이션 실행 (로그 파일로 리디렉션)
+        echo "Starting new Java application..."
+        nohup java -jar cicd-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        
+        # 새 애플리케이션 실행 후 프로세스 확인
+        echo "Checking if new Java application is running..."
+        ps aux | grep java
+        
+        # 세션 분리
+        disown
+        
+        # 종료 상태 확인
+        echo "Application started"
 
-
-          
-          # 프로세스 확인
-          ps aux | grep java
-          
-          # 세션 분리
-          disown
-          
-          # 종료 상태 확인
-          echo "Application started"
-        EOF
-        rm lightsail.pem
 
