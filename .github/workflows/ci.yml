@@ -41,10 +41,10 @@ jobs:
         rm lightsail.pem
 
     # 1.6 권한 설정 (애플리케이션 실행 전)
-    - name: Set permissions for app directory and log files
-      run: |
-        chmod -R 755 /home/${LIGHTSAIL_USERNAME}/app/
-        chmod 777 /home/${LIGHTSAIL_USERNAME}/app/app.log
+   # - name: Set permissions for app directory and log files
+    #  run: |
+     #   chmod -R 755 /home/${LIGHTSAIL_USERNAME}/app/
+     #   chmod 777 /home/${LIGHTSAIL_USERNAME}/app/app.log
 
     # 1.7 Lightsail에서 애플리케이션 실행
     - name: Start application on Lightsail
