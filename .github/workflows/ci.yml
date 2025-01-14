@@ -1,6 +1,6 @@
 name: CI/CD for Spring Boot Application
 
-on:
+#on:
  # push:
   # branches: ["master"]
 
