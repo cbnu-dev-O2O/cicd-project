@@ -3,7 +3,7 @@ name: CI/CD for Lightsail with Docker
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   # Job 1: Build Docker Image
