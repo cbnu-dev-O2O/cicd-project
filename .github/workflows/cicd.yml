@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           source: my-app.tar
-          target: /home/${{ secrets.LIGHTSAIL_USER }}/my-app.tar
+          target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
 
   # Job 3: Deploy Docker Container
   deploy:
