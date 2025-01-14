@@ -74,6 +74,9 @@ jobs:
             # Step 1: Load the Docker image
             docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
 
+            # docker images 
+            docker image ls -a
+
             # Step 2: Stop and remove existing container if any
             docker stop app || true
             docker rm app || true
