@@ -45,7 +45,7 @@ jobs:
           name: my-app-tar
 
       - name: Transfer Docker Image to Lightsail
-        uses: appleboy/scp-action@latest
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
@@ -61,7 +61,7 @@ jobs:
     needs: transfer  # Dependency on the transfer job
     steps:
       - name: Run Docker Image on Lightsail
-        uses: appleboy/ssh-action@latest
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
