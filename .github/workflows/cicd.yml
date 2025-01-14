@@ -36,22 +36,26 @@ jobs:
   transfer:
     name: Transfer Docker Image
     runs-on: ubuntu-latest
-
+  
     needs: build  # Dependency on the build job
     steps:
       - name: Download Docker Tar Artifact
         uses: actions/download-artifact@v3
         with:
           name: my-app-tar
-
+  
+      - name: Check downloaded artifact
+        run: ls -lh  # 디버깅을 위해 다운로드한 파일을 확인
+  
       - name: Transfer Docker Image to Lightsail
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: my-app.tar
+          source: ./my-app.tar  # 파일 경로가 정확한지 확인
           target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+
 
   # Job 3: Deploy Docker Container
   deploy:
