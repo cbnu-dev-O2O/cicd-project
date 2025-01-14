@@ -22,16 +22,6 @@ jobs:
         run: |
           docker build -t my-app:latest .
 
-      - name: Save Docker Image as Tar
-        run: |
-          docker save my-app:latest -o my-app.tar
-
-      - name: Upload Docker Tar Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: my-app-tar
-          path: my-app.tar
-
   # Job 2: Transfer Docker Image to Lightsail
   transfer:
     name: Transfer Docker Image
@@ -39,19 +29,15 @@ jobs:
 
     needs: build  # Dependency on the build job
     steps:
-      - name: Download Docker Tar Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: my-app-tar
-
       - name: Transfer Docker Image to Lightsail
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: my-app.tar
-          target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+          script: |
+            # Step 1: Save the Docker image to the Lightsail server (this will avoid creating tar file locally)
+            docker save my-app:latest | ssh -i ${{ secrets.LIGHTSAIL_SSH_KEY }} ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} "docker load"
 
   # Job 3: Deploy Docker Container
   deploy:
@@ -67,15 +53,12 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            # Step 1: Load the Docker image
-            docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
-
-            # Step 2: Stop and remove existing container if any
+            # Step 1: Stop and remove existing container if any
             docker stop app || true
             docker rm app || true
 
-            # Step 3: Run the container on port 8080
+            # Step 2: Run the container on port 8080
             docker run -d --name app -p 8080:8080 --restart unless-stopped my-app:latest
 
-            # Step 4: Ensure Nginx is forwarding traffic from port 80 to 8080
-            sudo systemctl restart nginx
+            # Step 3: Check if the container is running
+            docker ps
