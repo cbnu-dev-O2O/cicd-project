@@ -30,14 +30,13 @@ jobs:
     needs: build  # Dependency on the build job
     steps:
       - name: Transfer Docker Image to Lightsail
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          script: |
-            # Step 1: Save the Docker image to the Lightsail server (this will avoid creating tar file locally)
-            docker save my-app:latest | ssh -i ${{ secrets.LIGHTSAIL_SSH_KEY }} ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} "docker load"
+          source: ./my-app:latest
+          target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app:latest
 
   # Job 3: Deploy Docker Container
   deploy:
@@ -53,12 +52,12 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            # Step 1: Stop and remove existing container if any
+            # Step 1: Stop and remove any existing container
             docker stop app || true
             docker rm app || true
 
-            # Step 2: Run the container on port 8080
+            # Step 2: Run the container from the transferred image
             docker run -d --name app -p 8080:8080 --restart unless-stopped my-app:latest
 
-            # Step 3: Check if the container is running
+            # Step 3: Verify if the container is running
             docker ps
