@@ -98,7 +98,7 @@ jobs:
 
             # Step 1: Load the Docker image
             echo "Loading Docker image..."
-            docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar || exit 1
+            docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar/my-app.tar || exit 1
 
             # Step 2: Stop and remove existing container if any
             echo "Stopping and removing any existing container..."
