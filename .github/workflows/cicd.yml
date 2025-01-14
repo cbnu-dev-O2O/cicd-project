@@ -102,11 +102,11 @@ jobs:
 
             # Step 2: Stop and remove existing container if any
             echo "Stopping and removing any existing container..."
-            docker stop app || true
-            docker rm app || true
+            docker stop my-app || true
+            docker rm my-app || true
 
             # Step 3: Run the container on port 8080
             echo "Running the container on port 8080..."
-            docker run -d --name app -p 8080:8080 --restart unless-stopped my-app:latest || exit 1
+            docker run -d --name my-app -p 8080:8080 --restart unless-stopped my-app:latest || exit 1
 
             echo "Deployment completed successfully!"
