@@ -56,6 +56,16 @@ jobs:
           source: ./my-app.tar  # 파일 경로가 정확한지 확인
           target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
 
+      - name: Check transferred file on Lightsail
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            ls -lh /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+
+
 
   # Job 3: Deploy Docker Container
   deploy:
@@ -74,8 +84,7 @@ jobs:
             # Step 1: Load the Docker image
             docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
 
-            # docker images 
-            docker image ls -a
+        
 
             # Step 2: Stop and remove existing container if any
             docker stop app || true
