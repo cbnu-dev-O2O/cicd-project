@@ -24,9 +24,10 @@ jobs:
 
       - name: Save Docker Image as Tar
         run: |
-          mkdir -p /home/ubuntu  # 디렉토리가 없으면 생성
-          docker save my-app:latest -o /home/ubuntu/my-app.tar
-          ls -lh /home/ubuntu/my-app.tar  # 파일 존재 여부 확인
+          sudo mkdir -p /home/${{ secrets.LIGHTSAIL_USERNAME }}  
+          sudo docker save my-app:latest -o /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+          ls -lh /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar  # 파일 존재 여부 확인
+
 
 
       - name: Upload Docker Tar Artifact
