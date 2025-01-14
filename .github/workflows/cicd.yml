@@ -35,7 +35,7 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: ./my-app:latest
+          source: ./my-app:latest  # Docker 이미지 파일을 전송 (tar 형식이 아님)
           target: /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app:latest
 
   # Job 3: Deploy Docker Container
