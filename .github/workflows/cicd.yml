@@ -18,6 +18,10 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Check Docker Version
+        run: |
+          docker --version  # Docker 버전 확인
+
       - name: Build Docker Image
         run: |
           docker build -t my-app:latest .
