@@ -24,9 +24,11 @@ jobs:
 
       - name: Save Docker Image as Tar
         run: |
-          sudo mkdir -p /home/${{ secrets.LIGHTSAIL_USERNAME }}  
+          sudo mkdir -p /home/${{ secrets.LIGHTSAIL_USERNAME }}  # 디렉토리 생성
           sudo docker save my-app:latest -o /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+          sudo chmod 777 /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar  # 모든 사용자에게 읽기/쓰기 권한 부여
           ls -lh /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar  # 파일 존재 여부 확인
+
 
 
 
