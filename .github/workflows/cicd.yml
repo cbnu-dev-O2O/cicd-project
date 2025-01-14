@@ -64,4 +64,18 @@ jobs:
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secre
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            # Step 1: Load the Docker image
+            docker load -i /home/${{ secrets.LIGHTSAIL_USERNAME }}/my-app.tar
+
+            # Step 2: Stop and remove existing container if any
+            docker stop app || true
+            docker rm app || true
+
+            # Step 3: Run the container on port 8080
+            docker run -d --name app -p 8080:8080 --restart unless-stopped my-app:latest
+
+            # Step 4: Ensure Nginx is forwarding traffic from port 80 to 8080
+            sudo systemctl restart nginx
