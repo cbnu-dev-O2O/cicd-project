@@ -21,16 +21,17 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t my-app:latest .
-      
+
       - name: Save Docker Image as Tar
         run: |
-          docker save my-app:latest -o my-app.tar
+          docker save my-app:latest -o /home/ubuntu/my-app.tar
+          ls -lh /home/ubuntu/my-app.tar  # 파일 존재 여부 확인
 
       - name: Upload Docker Tar Artifact
         uses: actions/upload-artifact@v3
         with:
           name: my-app-tar
-          path: ./my-app.tar
+          path: /home/ubuntu/my-app.tar  # 절대 경로로 지정
 
 
   # Job 2: Transfer Docker Image to Lightsail
